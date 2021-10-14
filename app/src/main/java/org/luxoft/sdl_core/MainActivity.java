@@ -255,6 +255,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             Log.e(TAG, "Exception during assets initialization: " + e.toString());
         }
+
+        AndroidSettings.loadSettings(getFilesDir().toString());
     }
 
     private String getWritableExternalDirectory() {
