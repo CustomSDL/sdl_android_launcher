@@ -19,7 +19,7 @@ public class IniLoader {
     }
 
     public boolean reload() {
-        return isEmpty(mFilePath) && loadProcess(mFilePath);
+        return isBlank(mFilePath) && loadProcess(mFilePath);
     }
 
     private boolean loadProcess(String filePath) {
@@ -36,7 +36,7 @@ public class IniLoader {
                 line = line.trim();
 
                 //Blank line
-                if (isEmpty(line)) {
+                if (isBlank(line)) {
                     // no process
                 }
                 //Comment line
@@ -50,8 +50,9 @@ public class IniLoader {
                 }
                 //Parameter line
                 else if (line.length() >= 3 && line.contains("=") && line.length() > line.indexOf("=") + 1) {
-                    String key = line.substring(0, line.indexOf("="));
-                    String value = line.substring(line.indexOf("=") + 1);
+                    final int tIndex = line.indexOf("=");
+                    String key = line.substring(0, tIndex);
+                    String value = line.substring(tIndex + 1);
 
                     map.put(key.trim(), value);
                     mDataMap.put(section.trim(), map);
@@ -106,7 +107,7 @@ public class IniLoader {
         return false;
     }
 
-    private boolean isEmpty(String str) {
+    private boolean isBlank(String str) {
         return str == null || str.length() == 0;
     }
 }

@@ -2,32 +2,24 @@ package org.luxoft.sdl_core;
 
 import android.util.Log;
 
+import java.util.HashMap;
+
 public class AndroidSettings {
 
     private static final String AndroidSection = "ANDROID";
-    private static final String TAG = CompressionUtil.class.getSimpleName();
+    private static final String TAG = AndroidSettings.class.getSimpleName();
 
-    private static int bufferSize = 131072;
-    private static String readerSocketAdress = "./localBleReader";
-    private static String controlSocketAdress = "./localBleControl";
-    private static String writerSocketAdress = "./localBleWriter";
-    private static int prefferredMtu = 512;
-    private static String sdlTesterServiceUUID = "00001101-0000-1000-8000-00805f9b34fb";
-    private static String mobileNotificationCharacteristic = "00001102-0000-1000-8000-00805f9b34fb";
-    private static String mobileResponceCharacteristic = "00001104-0000-1000-8000-00805f9b34fb";
+    private static HashMap<String, String> mValues;
 
-    private static int getIntValue(IniLoader iniFile, String section, String Key, int defaultValue) {
-        int result = defaultValue;
-
-        if (iniFile.containsKey(section, Key)) {
-            String value = iniFile.getValue(section, Key);
-            try {
-                result = Integer.parseInt(value.trim());
-            } catch (NumberFormatException ex) {
-                ex.printStackTrace();
-            }
-        }
-        return result;
+    public enum IniParams {
+        BufferSize,
+        ReaderSocketAdress,
+        ControlSocketAdress,
+        WriterSocketAdress,
+        PrefferredMtu,
+        SdlTesterServiceUUID,
+        MobileNotificationCharacteristic,
+        MobileResponceCharacteristic
     }
 
     private static String getStrValue(IniLoader iniFile, String section, String Key, String defaultValue) {
@@ -40,50 +32,56 @@ public class AndroidSettings {
         return result;
     }
 
-    public static  void loadSettings(String filepath) {
+    public static void loadSettings(String filepath) {
+
+        HashMap<String, String> defaulValues  = new HashMap<String, String>() {{
+            put(IniParams.BufferSize.toString(),                       "131072");
+            put(IniParams.ReaderSocketAdress.toString(),               "./localBleReader");
+            put(IniParams.ControlSocketAdress.toString(),              "./localBleControl");
+            put(IniParams.WriterSocketAdress.toString(),               "./localBleWriter");
+            put(IniParams.PrefferredMtu.toString(),                    "512");
+            put(IniParams.SdlTesterServiceUUID.toString(),             "00001101-0000-1000-8000-00805f9b34fb");
+            put(IniParams.MobileNotificationCharacteristic.toString(), "00001102-0000-1000-8000-00805f9b34fb");
+            put(IniParams.MobileResponceCharacteristic.toString(),     "00001104-0000-1000-8000-00805f9b34fb");
+        }};
+
+        mValues = new HashMap<>();
+        // fill with default values
+        for (IniParams key : IniParams.values()) {
+            final String keyName = key.toString();
+            assert defaulValues.containsKey(keyName) : "Default value is not found for key: " + keyName;
+            mValues.put(keyName, defaulValues.get(keyName));
+        }
+
         IniLoader iniLoader = new IniLoader();
         iniLoader.load(filepath + "/androidSmartDeviceLink.ini");
 
-        bufferSize = getIntValue(iniLoader, AndroidSection, "BufferSize", bufferSize);
-        readerSocketAdress = getStrValue(iniLoader, AndroidSection, "ReaderSocketAdress", readerSocketAdress);
-        controlSocketAdress = getStrValue(iniLoader, AndroidSection, "ControlSocketAdress", controlSocketAdress);
-        writerSocketAdress = getStrValue(iniLoader, AndroidSection, "WriterSocketAdress", writerSocketAdress);
-        prefferredMtu = getIntValue(iniLoader, AndroidSection, "PrefferredMtu", prefferredMtu);
-        sdlTesterServiceUUID = getStrValue(iniLoader, AndroidSection, "SdlTesterServiceUUID", sdlTesterServiceUUID);
-        mobileNotificationCharacteristic = getStrValue(iniLoader, AndroidSection, "MobileNotificationCharacteristic", mobileNotificationCharacteristic);
-        mobileResponceCharacteristic = getStrValue(iniLoader, AndroidSection, "MobileResponceCharacteristic", mobileResponceCharacteristic);
-
+        for (IniParams key : IniParams.values()) {
+            final String keyName = key.toString();
+            mValues.put(keyName, getStrValue(iniLoader, AndroidSection, keyName, defaulValues.get(keyName)));
+        }
     }
 
-    public static int getBufferSize() {
-        return bufferSize;
-    }
-    public static String getReaderSocketAddress() {
-        return readerSocketAdress;
-    }
-
-    public static String getControlSocketAddress() {
-        return controlSocketAdress;
+    public static String getStringValue(IniParams param) {
+        final String paramName = param.toString();
+        if(mValues.containsKey(paramName)) {
+            return mValues.get(paramName);
+        }
+        return "";
     }
 
-    public static String getWriterSocketAddress() {
-            return writerSocketAdress;
-    }
+    public static int getIntValue(IniParams param) {
+        int result = 0;
+        final String paramName = param.toString();
 
-    public static int getPrefferredMtu(){
-        return prefferredMtu;
+        if (mValues.containsKey(paramName)) {
+            String value = mValues.get(paramName);
+            try {
+                result = Integer.parseInt(value.trim());
+            } catch (NumberFormatException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return result;
     }
-
-    public static String getSdlTesterServiceUUID() {
-        return sdlTesterServiceUUID;
-    }
-
-    public static String getMobileNotificationCharacteristic() {
-        return mobileNotificationCharacteristic;
-    }
-
-    public static String getMobileResponseCharacteristic() {
-        return mobileResponceCharacteristic;
-    }
-
 }

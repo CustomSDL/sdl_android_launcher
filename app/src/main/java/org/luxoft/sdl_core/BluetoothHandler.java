@@ -88,10 +88,11 @@ class BluetoothHandler {
         @Override
         public void onServicesDiscovered(BluetoothPeripheral peripheral) {
 
-            peripheral.requestMtu(AndroidSettings.getPrefferredMtu());
+            peripheral.requestMtu(AndroidSettings.getIntValue(AndroidSettings.IniParams.PrefferredMtu));
 
-            peripheral.setNotify(UUID.fromString(AndroidSettings.getSdlTesterServiceUUID()),
-                    UUID.fromString(AndroidSettings.getMobileNotificationCharacteristic()), true);
+            final String sdlTesterUUID = AndroidSettings.getStringValue(AndroidSettings.IniParams.SdlTesterServiceUUID);
+            final String mobNotifChar = AndroidSettings.getStringValue(AndroidSettings.IniParams.MobileNotificationCharacteristic);
+            peripheral.setNotify(UUID.fromString(sdlTesterUUID), UUID.fromString(mobNotifChar),true);
 
             final Intent intent = new Intent(ON_BLE_PERIPHERAL_READY);
             context.sendBroadcast(intent);
@@ -120,7 +121,8 @@ class BluetoothHandler {
             if (status != GattStatus.SUCCESS) return;
 
             UUID characteristicUUID = characteristic.getUuid();
-            if (characteristicUUID.equals(UUID.fromString(AndroidSettings.getMobileNotificationCharacteristic()))) {
+            final String mobNotifChar = AndroidSettings.getStringValue(AndroidSettings.IniParams.MobileNotificationCharacteristic);
+            if (characteristicUUID.equals(UUID.fromString(mobNotifChar))) {
                 mLongReader.processReadOperation(value);
             }
         }
@@ -205,8 +207,11 @@ class BluetoothHandler {
             @Override
             public void OnLongMessageReady(byte[] message) {
 
-                BluetoothGattCharacteristic responseCharacteristic = mPeripheral.getCharacteristic(UUID.fromString(AndroidSettings.getSdlTesterServiceUUID())
-                        , UUID.fromString(AndroidSettings.getMobileResponseCharacteristic()));
+                final String sdlTesterUUID = AndroidSettings.getStringValue(AndroidSettings.IniParams.SdlTesterServiceUUID);
+                final String mobRespChar = AndroidSettings.getStringValue(AndroidSettings.IniParams.MobileResponceCharacteristic);
+
+                BluetoothGattCharacteristic responseCharacteristic = mPeripheral.getCharacteristic(UUID.fromString(sdlTesterUUID)
+                        , UUID.fromString(mobRespChar));
                 if (responseCharacteristic != null) {
                     if ((responseCharacteristic.getProperties() & PROPERTY_WRITE) > 0) {
                         mPeripheral.writeCharacteristic(responseCharacteristic, message, WriteType.WITH_RESPONSE);
@@ -239,7 +244,7 @@ class BluetoothHandler {
             public void run() {
                 Log.d(TAG, "Searching for SDL-compatible peripherals...");
                 UUID[] servicesToSearch = new UUID[1];
-                servicesToSearch[0] = UUID.fromString(AndroidSettings.getSdlTesterServiceUUID());
+                servicesToSearch[0] = UUID.fromString(AndroidSettings.getStringValue(AndroidSettings.IniParams.SdlTesterServiceUUID));
                 central.scanForPeripheralsWithServices(servicesToSearch);
             }
         }, 1000);

@@ -24,7 +24,7 @@ public class CompressionUtil {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
 
         deflater.finish();
-        byte[] buffer = new byte[AndroidSettings.getBufferSize()];
+        byte[] buffer = new byte[AndroidSettings.getIntValue(AndroidSettings.IniParams.BufferSize)];
         while (!deflater.finished()) {
             int count = deflater.deflate(buffer);
             if(count > 0) {
@@ -46,7 +46,7 @@ public class CompressionUtil {
         inflater.setInput(data);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
-        byte[] buffer = new byte[AndroidSettings.getBufferSize()];
+        byte[] buffer = new byte[AndroidSettings.getIntValue(AndroidSettings.IniParams.BufferSize)];
         while (!inflater.finished()) {
             int count = inflater.inflate(buffer);
             if(count > 0) {

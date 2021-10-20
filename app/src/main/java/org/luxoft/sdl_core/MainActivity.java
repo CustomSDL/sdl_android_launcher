@@ -64,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        AndroidSettings.loadSettings(getFilesDir().toString());
+
         start_sdl_button = findViewById(R.id.start_sdl_button);
         stop_sdl_button = findViewById(R.id.stop_sdl_button);
 
@@ -255,8 +257,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             Log.e(TAG, "Exception during assets initialization: " + e.toString());
         }
-
-        AndroidSettings.loadSettings(getFilesDir().toString());
     }
 
     private String getWritableExternalDirectory() {

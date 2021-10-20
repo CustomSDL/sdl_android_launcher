@@ -22,7 +22,7 @@ public class BleLocalSocketReader implements BleReader {
     public void Connect(OnConnectCallback callback){
         Log.i(TAG, "Connect BleLocalSocketReader");
         try {
-            mServer = new LocalServerSocket(AndroidSettings.getReaderSocketAddress());
+            mServer = new LocalServerSocket(AndroidSettings.getStringValue(AndroidSettings.IniParams.ReaderSocketAdress));
         } catch (IOException e) {
             Log.e(TAG, "The localSocketServer creation failed");
             e.printStackTrace();
@@ -88,7 +88,7 @@ public class BleLocalSocketReader implements BleReader {
         public void run() {
             while (true) {
                 byte[] buffer;
-                buffer = new byte[AndroidSettings.getBufferSize()];
+                buffer = new byte[AndroidSettings.getIntValue(AndroidSettings.IniParams.BufferSize)];
                 int mBytesRead;
                 try {
                     mBytesRead = mInputStream.read(buffer);

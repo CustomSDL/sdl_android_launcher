@@ -28,8 +28,10 @@ public class JavaToNativeBleAdapter extends Thread {
     private final Context mContext;
 
     JavaToNativeBleAdapter(Context context){
-        mControlWriter = new BleLocalSocketWriter(AndroidSettings.getControlSocketAddress());
-        mWriter = new BleLocalSocketWriter(AndroidSettings.getWriterSocketAddress());
+        String ctrlSocketName = AndroidSettings.getStringValue(AndroidSettings.IniParams.ControlSocketAdress);
+        String writeSocketName = AndroidSettings.getStringValue(AndroidSettings.IniParams.WriterSocketAdress);
+        mControlWriter = new BleLocalSocketWriter(ctrlSocketName);
+        mWriter = new BleLocalSocketWriter(writeSocketName);
         mReader = new BleLocalSocketReader();
         mContext = context;
     }
